@@ -40,14 +40,17 @@ public class InitGrpc {
             }
             try {
                 AddEntity addEntity = JSONObject.parseObject(sb.toString(), AddEntity.class);
+                System.out.println(addEntity);
                 ExecResult result = add(addEntity);
                 System.out.println(CommonUtils.formatGrpcEntity(result));
             } catch (Exception e) {
                 try {
                     QueryEntity queryEntity = JSONObject.parseObject(sb.toString(), QueryEntity.class);
+                    System.out.println(queryEntity);
                     TaskState state = query(queryEntity);
                     System.out.println(CommonUtils.formatGrpcEntity(state));
                 } catch (Exception e1) {
+                    e.printStackTrace();
                     printHelp();
                 }
             }
@@ -57,7 +60,7 @@ public class InitGrpc {
     private static void printHelp() {
         System.out.println(" config-file-path ");
         System.out.println("add:{\"ip\":\"\",\"serverGrpcPort\":,\"srcDirs\":[],\"targetDirs\":[],\"tcGrpcPort\":,\"transferPort\":}");
-        System.out.println("query:{\"ip\":\"\",\"serverGrpcPort\":,\"taskId\":\"taskid\"}");
+        System.out.println("query:{\"ip\":\"\",\"grpcPort\":,\"taskId\":\"taskId\"}");
     }
 
     private static ExecResult add(AddEntity task) {
@@ -77,7 +80,7 @@ public class InitGrpc {
 
     private static TaskState query(QueryEntity task) {
         InitCopyGrpcClient client = new
-                InitCopyGrpcClient(task.getIp(), task.getServerGrpcPort());
+                InitCopyGrpcClient(task.getIp(), task.getGrpcPort());
         return client.query(QueryTask.newBuilder()
                 .setTaskId(task.getTaskId())
                 .build());

@@ -7,16 +7,22 @@ import lombok.ToString;
 
 import java.util.List;
 
-
+/**
+ *
+ *
+ * @author Shark.Yin
+ * @since 1.0
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class AddEntity {
     private String ip;
-    private Integer tcGrpcPort;
-    private Integer transferPort;
-    private Integer serverGrpcPort;
+    private String targetIp;
+    private Integer targetTCGrpcPort;
+    private Integer targetTransferPort;
+    private Integer sourceGrpcPort;
     private List<String> srcDirs;
     private List<String> targetDirs;
 }

@@ -5,6 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ *
+ *
+ * @author Shark.Yin
+ * @since 1.0
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

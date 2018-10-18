@@ -58,31 +58,36 @@ public class InitGrpc {
     }
 
     private static void printHelp() {
-        System.out.println(" config-file-path ");
-        System.out.println("add:{\"ip\":\"\",\"serverGrpcPort\":,\"srcDirs\":[],\"targetDirs\":[],\"tcGrpcPort\":,\"transferPort\":}");
-        System.out.println("query:{\"ip\":\"\",\"grpcPort\":,\"taskId\":\"taskId\"}");
+        System.out.println("InitGrpc [config-file-path] ");
+        System.out.println("File format:");
+        System.out.println("\tadd:{\"ip\":\"\",\"sourceGrpcPort\":,\"srcDirs\":[],\"targetDirs\":[],\"targetTCGrpcPort\":,\"targetTransferPort\":}");
+        System.out.println("\tquery:{\"ip\":\"\",\"grpcPort\":,\"taskId\":\"\"}");
     }
 
     private static ExecResult add(AddEntity task) {
         // 客户端添加任务。
+        SyncTarget.Builder targetBuilder = SyncTarget.newBuilder()
+                .setIp(task.getTargetIp())
+                .setGrpcPort(task.getTargetTCGrpcPort())
+                .setTransferPort(task.getTargetTransferPort());
         SyncTask.Builder builder = SyncTask.newBuilder();
         builder.addAllFiles(task.getSrcDirs())
                 .addAllTargetDirs(task.getTargetDirs())
                 .setSyncType(SyncType.SYNC_ALL)
-                .setTargetInfo(SyncTarget.newBuilder()
-                        .setIp(task.getIp())
-                        .setGrpcPort(task.getTcGrpcPort())
-                        .setTransferPort(task.getTransferPort())
-                        .build());
-        InitCopyGrpcClient client = new InitCopyGrpcClient(task.getIp(), task.getServerGrpcPort());
-        return client.add(builder.build());
+                .setTargetInfo(targetBuilder);
+        InitCopyGrpcClient client = new InitCopyGrpcClient(task.getIp(), task.getSourceGrpcPort());
+        ExecResult result = client.add(builder.build());
+        client.close();
+        return result;
     }
 
     private static TaskState query(QueryEntity task) {
         InitCopyGrpcClient client = new
                 InitCopyGrpcClient(task.getIp(), task.getGrpcPort());
-        return client.query(QueryTask.newBuilder()
+        final TaskState state = client.query(QueryTask.newBuilder()
                 .setTaskId(task.getTaskId())
                 .build());
+        client.close();
+        return state;
     }
 }
